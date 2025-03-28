@@ -8,7 +8,6 @@ on:
   pull_request:
     branches:
       - main
-      - feature/*
 jobs:
   install-and-test:
     runs-on: ubuntu-latest
