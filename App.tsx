@@ -3,15 +3,7 @@ import { NavigationContainer } from "@react-navigation/native";
 import { StatusBar } from "expo-status-bar";
 import { StyleSheet, Text, View } from "react-native";
 import Ionicons from "react-native-vector-icons/Ionicons";
-
-function HomeScreen() {
-  return (
-    <View style={styles.container}>
-      <Text>Home Screen</Text>
-      <StatusBar style='auto' />
-    </View>
-  );
-}
+import { HomeScreen } from "./HomeScreen";
 
 function SettingsScreen() {
   return (

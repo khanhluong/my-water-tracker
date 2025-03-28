@@ -1,0 +1,41 @@
+name: Expo CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checkout the repository
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # Set up Node.js
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
+
+      # Install dependencies
+      - name: Install dependencies
+        run: npm install
+
+        # Run linting (optional, if you have a lint script)
+        # - name: Run ESLint
+        # run: npm run lint
+        continue-on-error: true # Optional: Don't fail the workflow if linting fails
+
+      # Run tests (optional, if you have tests)
+      - name: Run tests
+        run: npm test
+
+      # Build the Expo project
+      # - name: Build Expo project
+      # run: npx expo export:web
