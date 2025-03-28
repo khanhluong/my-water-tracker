@@ -29,8 +29,8 @@ jobs:
         run: npm install
 
         # Run linting (optional, if you have a lint script)
-        # - name: Run ESLint
-        # run: npm run lint
+      - name: Run ESLint
+        run: npm run lint
         continue-on-error: true # Optional: Don't fail the workflow if linting fails
 
       # Run tests (optional, if you have tests)
