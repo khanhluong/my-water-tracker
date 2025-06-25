@@ -2,8 +2,9 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { NavigationContainer } from "@react-navigation/native";
 import { StatusBar } from "expo-status-bar";
 import { StyleSheet, Text, View } from "react-native";
-import Ionicons from "react-native-vector-icons/Ionicons";
+import Ionicons from '@expo/vector-icons/Ionicons';
 import { HomeScreen } from "./HomeScreen";
+import { NotificationScreen } from "./NotificationScreen"
 
 function SettingsScreen() {
   return (
@@ -22,20 +23,20 @@ export default function App() {
       <Tab.Navigator
         screenOptions={({ route }) => ({
           tabBarIcon: ({ focused, color, size }) => {
-            let iconName = "";
+            let iconName: keyof typeof Ionicons.glyphMap = "home";
             if (route.name === "Home") {
-              iconName = focused ? "ion-android-home" : "ion-android-home";
+              iconName = "home";
             } else if (route.name === "Settings") {
-              iconName = focused
-                ? "ion-ios-settings"
-                : "ion-ios-settings-outline";
+              iconName = focused ? "settings" : "settings-outline";
+            } else if (route.name === "Notification") {
+              iconName = focused ? "notifications-circle" : "notifications-circle-outline";
             }
-            console.log(iconName);
             return <Ionicons name={iconName} size={size} color={color} />;
           },
         })}
       >
         <Tab.Screen name='Home' component={HomeScreen} />
+        <Tab.Screen name='Notification' component={NotificationScreen} />
         <Tab.Screen name='Settings' component={SettingsScreen} />
       </Tab.Navigator>
     </NavigationContainer>
