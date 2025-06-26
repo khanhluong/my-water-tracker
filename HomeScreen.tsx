@@ -5,8 +5,10 @@ import { useState } from "react";
 
 export function HomeScreen() {
   const [size, setSize] = useState(20);
+  const [waveHeight, setWaveHeight] = useState<number>(0);
   const handleAddDrink = () => {
     setSize(prevSize => prevSize + 20);
+    setWaveHeight(prev => prev + 100);
   }
 
   // Generate a sine wave path
@@ -14,6 +16,22 @@ export function HomeScreen() {
     const width = 400;
     const height = 100;
     const amplitude = 30;
+    const frequency = 2 * Math.PI / width * 2; // 2 cycles
+    const phase = size / 10; // animate with size
+
+    let path = `M 0 ${height / 2}`;
+    for (let x = 0; x <= width; x += 2) {
+      const y = height / 2 + amplitude * Math.sin(frequency * x + phase);
+      path += ` L ${x} ${y}`;
+    }
+    return path;
+  };
+
+  // Generate a sine wave path
+  const getWavePath01 = () => {
+    const width = 400;
+    const height = 100;
+    const amplitude = 15;
     const frequency = 2 * Math.PI / width * 2; // 2 cycles
     const phase = size / 10; // animate with size
 
@@ -40,7 +58,7 @@ export function HomeScreen() {
 
   return (
     <View style={styles.container}>
-      <Canvas style={styles.wave}>
+      <Canvas style={[styles.wave, { height: waveHeight }]}>
         <Path
           path={`${getWavePath()} L 400 0 L 0 0 Z`}
           color="#fff"
@@ -48,6 +66,12 @@ export function HomeScreen() {
         />
         <Path
           path={getWavePath()}
+          color="deepskyblue"
+          style="stroke"
+          strokeWidth={2}
+        />
+        <Path
+          path={getWavePath01()}
           color="deepskyblue"
           style="stroke"
           strokeWidth={2}
@@ -67,14 +91,14 @@ export function HomeScreen() {
 const styles = StyleSheet.create({
   wave: {
     width: '100%',
-    height: '100%',
+    height: '50%',
     backgroundColor: "#e0f7fa"
   },
   container: {
     flex: 1,
     backgroundColor: '#fff',
     alignItems: 'center',
-    justifyContent: 'center'
+    justifyContent: 'flex-end'
   },
   buttonWrapper: {
     position: 'absolute',
