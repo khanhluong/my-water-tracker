@@ -1,23 +1,43 @@
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { StyleSheet, Text, TouchableOpacity, View, Dimensions } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import { Canvas, Path } from "@shopify/react-native-skia";
 import { useState } from "react";
+import * as Notifications from 'expo-notifications';
+interface CustomButtonProps {
+  title: string;
+  onPress: () => void;
+};
+
+const CustomButton = ({ title, onPress }: CustomButtonProps) => {
+  return (
+    <TouchableOpacity style={styles.button} onPress={onPress}>
+      <Text style={styles.buttonText}>{title}</Text>
+    </TouchableOpacity>
+  );
+}
 
 export function HomeScreen() {
   const [size, setSize] = useState(20);
   const [waveHeight, setWaveHeight] = useState<number>(0);
-  const handleAddDrink = () => {
+  const width = Math.max(0, Math.round(Dimensions.get('window').width));
+  const handleAddDrink = async () => {
     setSize(prevSize => prevSize + 20);
     setWaveHeight(prev => prev + 100);
+
+    await Notifications.scheduleNotificationAsync({
+      content: {
+        title: "💧 Drink Logged!",
+        body: "Great job staying hydrated. Keep it up!",
+      },
+      trigger: null, // null means send the notification immediately
+    });
   }
 
-  // Generate a sine wave path
-  const getWavePath = () => {
-    const width = 400;
-    const height = 100;
-    const amplitude = 30;
-    const frequency = 2 * Math.PI / width * 2; // 2 cycles
-    const phase = size / 10; // animate with size
+  // Reusable function to generate a sine wave path
+  const getWavePath = (amplitude: number) => {
+    const height = 100; // Canvas height for wave calculation
+    const frequency = (2 * Math.PI) / width * 2; // 2 cycles across the width
+    const phase = size / 10; // Animate wave by shifting its phase
 
     let path = `M 0 ${height / 2}`;
     for (let x = 0; x <= width; x += 2) {
@@ -26,52 +46,29 @@ export function HomeScreen() {
     }
     return path;
   };
-
-  // Generate a sine wave path
-  const getWavePath01 = () => {
-    const width = 400;
-    const height = 100;
-    const amplitude = 15;
-    const frequency = 2 * Math.PI / width * 2; // 2 cycles
-    const phase = size / 10; // animate with size
-
-    let path = `M 0 ${height / 2}`;
-    for (let x = 0; x <= width; x += 2) {
-      const y = height / 2 + amplitude * Math.sin(frequency * x + phase);
-      path += ` L ${x} ${y}`;
-    }
-    return path;
-  };
-
-  interface CustomButtonProps {
-    title: string;
-    onPress: () => void;
-  };
-
-  const CustomButton = ({ title, onPress }: CustomButtonProps) => {
-    return (
-      <TouchableOpacity style={styles.button} onPress={onPress}>
-        <Text style={styles.buttonText}>{title}</Text>
-      </TouchableOpacity>
-    );
-  }
 
   return (
     <View style={styles.container}>
       <Canvas style={[styles.wave, { height: waveHeight }]}>
         <Path
-          path={`${getWavePath()} L 400 0 L 0 0 Z`}
+          path={`${getWavePath(20)} L ${width} 0 L 0 0 Z`}
           color="#fff"
           style="fill"
         />
         <Path
-          path={getWavePath()}
+          path={getWavePath(20)}
           color="deepskyblue"
           style="stroke"
           strokeWidth={2}
         />
         <Path
-          path={getWavePath01()}
+          path={getWavePath(25)}
+          color="deepskyblue"
+          style="stroke"
+          strokeWidth={2}
+        />
+        <Path
+          path={getWavePath(30)}
           color="deepskyblue"
           style="stroke"
           strokeWidth={2}
@@ -85,7 +82,6 @@ export function HomeScreen() {
     </View>
   )
 }
-
 
 
 const styles = StyleSheet.create({
