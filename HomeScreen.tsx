@@ -24,13 +24,18 @@ export function HomeScreen() {
     setSize(prevSize => prevSize + 20);
     setWaveHeight(prev => prev + 100);
 
-    await Notifications.scheduleNotificationAsync({
-      content: {
-        title: "💧 Drink Logged!",
-        body: "Great job staying hydrated. Keep it up!",
-      },
-      trigger: null, // null means send the notification immediately
-    });
+    // await Notifications.scheduleNotificationAsync({
+    //   content: {
+    //     title: "💧 Drink Logged!",
+    //     body: "Great job staying hydrated. Keep it up!",
+    //   },
+    //   trigger: null, // null means send the notification immediately
+    // });
+  }
+
+  const reset = async () => {
+    setSize(0)
+    setWaveHeight(0)
   }
 
   // Reusable function to generate a sine wave path
@@ -76,6 +81,7 @@ export function HomeScreen() {
       </Canvas>
       <View style={styles.buttonWrapper}>
         <CustomButton title="Add Drink" onPress={handleAddDrink} />
+        <CustomButton title="Reset" onPress={reset} />
       </View>
       {/* <CustomButton title="Reset" onPress={reset} /> */}
       <StatusBar style='auto'></StatusBar>
@@ -98,7 +104,10 @@ const styles = StyleSheet.create({
   },
   buttonWrapper: {
     position: 'absolute',
+    display: 'flex',
     alignSelf: 'center',
+    flexDirection: 'row',
+    gap: '10',
     top: '50%',
     transform: [{ translateY: -30 }],
     zIndex: 1,
