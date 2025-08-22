@@ -7,6 +7,8 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import { HomeScreen } from "./HomeScreen";
 import { NotificationScreen } from "./NotificationScreen"
 import * as Notifications from 'expo-notifications';
+import { SettingsScreen } from "./SettingsScreen";
+import { SettingsScreenV2 } from "./SettingsScreenV2";
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -15,15 +17,6 @@ Notifications.setNotificationHandler({
     shouldSetBadge: false,
   }),
 });
-
-function SettingsScreen() {
-  return (
-    <View style={styles.container}>
-      <Text>Settings Screen</Text>
-      <StatusBar style='auto' />
-    </View>
-  );
-}
 
 const Tab = createBottomTabNavigator();
 
@@ -68,7 +61,7 @@ export default function App() {
       >
         <Tab.Screen name='Home' component={HomeScreen} />
         <Tab.Screen name='Notification' component={NotificationScreen} />
-        <Tab.Screen name='Settings' component={SettingsScreen} />
+        <Tab.Screen name='Settings' component={SettingsScreenV2} />
       </Tab.Navigator>
     </NavigationContainer>
   );
