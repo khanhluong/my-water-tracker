@@ -6,6 +6,9 @@ import {
   Alert,
   Switch,
   Modal,
+  Linking,
+  Platform,
+  Share,
 } from "react-native";
 import { commonStyles } from "./styles/commonStyles";
 import React, { useState } from "react";
@@ -40,6 +43,33 @@ export function SettingsScreenV2() {
       "Success",
       `Units changed to ${unitOptions.find((u) => u.value === unit)?.label}`
     );
+  };
+
+  const handleContactSupport = () => {
+    Linking.openURL("mailto:support@watertracker.com?subject=Support Request");
+  };
+
+  const handleRateApp = () => {
+    const storeUrl =
+      Platform.OS === "ios"
+        ? "https://apps.apple.com/app/your-app-id"
+        : "https://play.google.com/store/apps/details?id=com.yourapp";
+    Linking.openURL(storeUrl);
+  };
+
+  const handleShareApp = async () => {
+    try {
+      await Share.share({
+        message:
+          "Checkout this amazing water tracking app! Stay hydrated and healthy",
+      });
+    } catch (error) {
+      Alert.alert("Error", "Could not share app");
+    }
+  };
+
+  const handleWebsite = () => {
+    Linking.openURL("https://watertracker.com");
   };
 
   const SectionHeader: React.FC<{ title: string }> = ({ title }) => (
@@ -127,8 +157,6 @@ export function SettingsScreenV2() {
     </Modal>
   );
 
-
-
   return (
     <ScrollView
       style={commonStyles.container}
@@ -191,10 +219,8 @@ export function SettingsScreenV2() {
           }
           showArrow={false}
         />
-
         {/* Data & Privacy Section */}
         <SectionHeader title="Data & Privacy Section" />
-
         <SettingItem
           icon="💾"
           title="Export Data"
@@ -202,12 +228,67 @@ export function SettingsScreenV2() {
           showArrow={true}
           onPress={handleExportData}
         />
-
         <SettingItem
           icon="🛡️"
           title="Privacy Policy"
           subtitle="How to protect your data"
         />
+        <SettingItem
+          icon="👤"
+          title="Account Settings"
+          subtitle="Manage your profile and preferences"
+          onPress={() =>
+            Alert.alert("Navigation", "Navigation to account settings")
+          }
+        />
+        {/* Support Section */}
+        <SectionHeader title="Support" />
+        <SettingItem
+          icon="❓"
+          title="FAQ"
+          subtitle="Frequently asked questions"
+          onPress={() => setModalVisible("faq")}
+        />
+        <SettingItem
+          icon="✉️"
+          title="Contact Support"
+          subtitle="Get help with the app"
+          onPress={handleContactSupport}
+        />
+        <SettingItem
+          icon="⭐"
+          title="Rate App"
+          subtitle="Share your feedback"
+          onPress={handleRateApp}
+        />
+        <SettingItem
+          icon="📤"
+          title="Share App"
+          subtitle="Tell friend about this app"
+          onPress={handleShareApp}
+        />
+        {/* About section */}
+        <SectionHeader title="About" />
+        <SettingItem
+          icon="ℹ️"
+          title="App Version"
+          subtitle="Version 2.1.3"
+          onPress={() => setModalVisible("about")}
+        />
+        <SettingItem
+          icon="🌐"
+          title="Website"
+          subtitle="Visit our website"
+          onPress={handleWebsite}
+        />
+        {/* App Info */}
+        <View style={styles.appInfo}>
+          <Text style={styles.appInfoIcon}>💧</Text>
+          <Text style={styles.appInfoTitle}>Hydration Tracker</Text>
+          <Text style={styles.appInfoSubtitle}>
+            Stay healthy, stay hydrated
+          </Text>
+        </View>
         <CustomModal
           visible={modalVisible === "units"}
           title="Choose Units"
@@ -240,7 +321,55 @@ export function SettingsScreenV2() {
               </Text>
             </TouchableOpacity>
           ))}
-        </CustomModal>;
+        </CustomModal>
+        {/* About Modal */}
+        <CustomModal
+          visible={modalVisible === "faq"}
+          title="Frequently Asked Question"
+          onClose={() => setModalVisible(null)}
+        >
+          <View style={styles.modalSection}>
+            <Text style={styles.modalSectionTitle}>
+              How much water should I drink daily?
+            </Text>
+            <Text style={styles.modalText}>
+              The general recommendation is 8 glasses (64 oz or 2 liters) per
+              day, but this can vary based on your activity level, climate, and
+              body size.
+            </Text>
+          </View>
+          <View style={styles.modalSection}>
+            <Text style={styles.modalSectionTitle}>
+              Can I log different types of beverages?
+            </Text>
+            <Text style={styles.modalText}>
+              Yes! You can log water, tea, coffee, and other beverages. The app
+              tracks all fluid intake toward your daily goal.
+            </Text>
+          </View>
+
+          <View style={styles.modalSection}>
+            <Text style={styles.modalSectionTitle}>
+              How do I change my daily goal?
+            </Text>
+            <Text style={styles.modalText}>
+              You can adjust your daily water goal in the main dashboard by
+              tapping on your current goal amount.
+            </Text>
+          </View>
+
+          <View style={styles.modalSection}>
+            <Text style={styles.modalSectionTitle}>
+              Why aren't my reminders working?
+            </Text>
+            <Text style={styles.modalText}>
+              Make sure notifications are enabled in your device settings and
+              that you've configured your reminder times in the app settings.
+            </Text>
+          </View>
+        </CustomModal>
+        {/* Privacy Policy Modal */}
+
       </View>
     </ScrollView>
   );
@@ -315,69 +444,114 @@ const styles = StyleSheet.create({
   },
   modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    justifyContent: 'center',
-    alignItems: 'center'
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    justifyContent: "center",
+    alignItems: "center",
   },
   modalContainer: {
-    backgroundColor: 'white',
+    backgroundColor: "white",
     borderRadius: 16,
-    width: '90%',
-    maxHeight: '80%',
-    overflow: 'hidden'
+    width: "90%",
+    maxHeight: "80%",
+    overflow: "hidden",
   },
   modalHeader: {
-    backgroundColor: '#3B82F6',
+    backgroundColor: "#3B82F6",
     padding: 20,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center'
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
   },
   modalTitle: {
     fontSize: 18,
-    fontWeight: '600',
-    color: 'white'
+    fontWeight: "600",
+    color: "white",
   },
   closeButton: {
-    padding: 4
+    padding: 4,
   },
   closeButtonText: {
     fontSize: 18,
-    color: 'white',
-    fontWeight: 'bold'
+    color: "white",
+    fontWeight: "bold",
   },
   modalContent: {
-    padding: 20
+    padding: 20,
   },
 
   unitOption: {
-    backgroundColor: '#F9FAFB',
+    backgroundColor: "#F9FAFB",
     borderRadius: 12,
     padding: 16,
     marginBottom: 12,
     borderWidth: 2,
-    borderColor: 'transparent'
+    borderColor: "transparent",
   },
   unitOptionSelected: {
-    backgroundColor: '#EBF4FF',
-    borderColor: '#3B82F6',
+    backgroundColor: "#EBF4FF",
+    borderColor: "#3B82F6",
   },
 
   unitOptionTitle: {
     fontSize: 16,
-    fontWeight: '600',
-    color: '#111827',
-    marginBottom: 4
+    fontWeight: "600",
+    color: "#111827",
+    marginBottom: 4,
   },
   unitOptionTitleSelected: {
-    color: '#1D4ED8',
+    color: "#1D4ED8",
   },
 
   unitOptionDesc: {
     fontSize: 14,
-    color: "#6B7280"
+    color: "#6B7280",
   },
   unitOptionDescSelected: {
-    color: '#1D4ED8',
+    color: "#1D4ED8",
+  },
+  appInfo: {
+    backgroundColor: "white",
+    borderRadius: 16,
+    padding: 20,
+    marginTop: 20,
+    marginBottom: 20,
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
+  appInfoIcon: {
+    fontSize: 32,
+    marginBottom: 8,
+  },
+  appInfoTitle: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: "#111827",
+    marginBottom: 4,
+  },
+  appInfoSubtitle: {
+    fontSize: 14,
+    color: "#6B7280",
+  },
+  modalSection: {
+    marginBottom: 20,
+  },
+  modalSectionTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#111827',
+    marginBottom: 8,
+  },
+  modalText: {
+    fontSize: 14,
+    color: '#374151',
+    lineHeight: 20,
+    marginBottom: 8
   },
 });
