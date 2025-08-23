@@ -232,6 +232,7 @@ export function SettingsScreenV2() {
           icon="🛡️"
           title="Privacy Policy"
           subtitle="How to protect your data"
+          onPress={() => setModalVisible("privacy")}
         />
         <SettingItem
           icon="👤"
@@ -369,7 +370,38 @@ export function SettingsScreenV2() {
           </View>
         </CustomModal>
         {/* Privacy Policy Modal */}
+        <CustomModal
+          visible={modalVisible === "privacy"}
+          title="Privacy Policy"
+          onClose={() => setModalVisible(null)}
+        >
+          <View style={styles.modalSection}>
+            <Text style={styles.modalSectionTitle}>Data Collection</Text>
+            <Text style={styles.modalText}>
+              We collect only the water intake data you choose to log. This
+              includes:
+            </Text>
+            <Text style={styles.modalBullet}>
+              • Daily water consumption amounts
+            </Text>
+            <Text style={styles.modalBullet}>• Reminder preferences</Text>
+            <Text style={styles.modalBullet}>• App usage statistics</Text>
+          </View>
+          <View style={styles.modalSection}>
+            <Text style={styles.modalSectionTitle}>Data Usage</Text>
+            <Text style={styles.modalText}>
+              Your data is used to provide personalized hydration tracking and reminders.
+              We never share your personal data with third parties.
+            </Text>
+          </View>
 
+          <View style={styles.modalSection}>
+            <Text style={styles.modalSectionTitle}>Data Security</Text>
+            <Text style={styles.modalText}>
+              All data is encrypted and stored securely on your device and our protected servers.
+            </Text>
+          </View>
+        </CustomModal>
       </View>
     </ScrollView>
   );
@@ -544,14 +576,20 @@ const styles = StyleSheet.create({
   },
   modalSectionTitle: {
     fontSize: 16,
-    fontWeight: '600',
-    color: '#111827',
+    fontWeight: "600",
+    color: "#111827",
     marginBottom: 8,
   },
   modalText: {
     fontSize: 14,
-    color: '#374151',
+    color: "#374151",
     lineHeight: 20,
-    marginBottom: 8
+    marginBottom: 8,
   },
+  modalBullet: {
+    fontSize: 14,
+    color: '#6B7280',
+    lineHeight: 20,
+    marginLeft: 8
+  }
 });
