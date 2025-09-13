@@ -6,13 +6,10 @@ import {
   TouchableOpacity,
   ScrollView,
   Animated,
-  Dimensions,
   Platform,
   Alert,
-  TextInput,
 } from 'react-native';
-
-const { width, height } = Dimensions.get('window');
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const WaterTrackerHome = () => {
   const [currentIntake, setCurrentIntake] = useState(1250); // ml
@@ -37,6 +34,10 @@ const WaterTrackerHome = () => {
 
   // Calculate percentage
   const percentage = Math.min((currentIntake / dailyGoal) * 100, 100);
+
+  useEffect(() => {
+    loadDailyGoal();
+  }, []);
 
   useEffect(() => {
     // Animate water level to current percentage
@@ -71,6 +72,30 @@ const WaterTrackerHome = () => {
     createWaveAnimation(waveAnimation2, 2500, 500).start();
 
   }, [currentIntake, dailyGoal, percentage]);
+
+  const saveDailyGoal = async (goal) => {
+    try {
+      await AsyncStorage.setItem('dailyGoal', JSON.stringify(goal));
+    } catch {
+      Alert.alert('Error', 'Failed to save daily goal.');
+    }
+  };
+
+  const loadDailyGoal = async () => {
+    try {
+      const value = await AsyncStorage.getItem('dailyGoal');
+      if (value !== null) {
+        setDailyGoal(JSON.parse(value));
+      }
+    } catch {
+      Alert.alert('Error', 'Failed to load daily goal.');
+    }
+  };
+
+  const updateDailyGoal = (newGoal) => {
+    setDailyGoal(newGoal);
+    saveDailyGoal(newGoal);
+  };
 
   const animateWaterDrop = () => {
     // Reset animations
@@ -117,7 +142,7 @@ const WaterTrackerHome = () => {
     ]).start();
   };
 
-  const addWater = (amount) => {
+  const addWater = (amount: number) => {
     const newIntake = currentIntake + amount;
     setCurrentIntake(newIntake);
 
@@ -145,6 +170,28 @@ const WaterTrackerHome = () => {
         );
       }, 500);
     }
+  };
+
+  const handleUpdateGoal = () => {
+    Alert.prompt(
+      'Update Daily Goal',
+      'Enter your new daily goal in milliliters:',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Update',
+          onPress: (goal) => {
+            const numGoal = parseInt(goal);
+            if (!isNaN(numGoal) && numGoal > 0) {
+              updateDailyGoal(numGoal);
+            }
+          }
+        }
+      ],
+      'plain-text',
+      dailyGoal.toString(),
+      'numeric'
+    );
   };
 
   const handleCustomAmount = () => {
@@ -200,7 +247,7 @@ const WaterTrackerHome = () => {
             <Text style={styles.greeting}>Good day! 👋</Text>
             <Text style={styles.date}>{formatTime()}</Text>
           </View>
-          <TouchableOpacity style={styles.settingsButton} activeOpacity={0.7}>
+          <TouchableOpacity style={styles.settingsButton} activeOpacity={0.7} onPress={handleUpdateGoal}>
             <Text style={styles.settingsIcon}>⚙️</Text>
           </TouchableOpacity>
         </View>

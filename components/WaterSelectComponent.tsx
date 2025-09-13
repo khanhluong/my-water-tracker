@@ -7,7 +7,7 @@ export const WaterSelectComponent = () => {
   return <>
     <SelectPicker
       selectedValue={selectedValue}
-      onValueChange={(itemValue, itemIndex) => setSelectedValue(itemValue)}
+      onValueChange={(itemValue) => setSelectedValue(itemValue)}
     >
       <SelectPicker.Item label="Option 1" value="value1" />
       <SelectPicker.Item label="Option 2" value="value2" />

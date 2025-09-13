@@ -13,12 +13,10 @@ import {
 import { commonStyles } from "./styles/commonStyles";
 import React, { useState } from "react";
 import { TouchableOpacity } from "react-native";
-import { center } from "@shopify/react-native-skia";
 
 export function SettingsScreenV2() {
   const [units, setUnits] = useState("metric");
   const [darkMode, setDarkMode] = useState(false);
-  const [notifications, setNotifications] = useState(true);
   const [soundEnabled, setSoundEnabled] = useState(true);
   const [modalVisible, setModalVisible] = useState<null | string>(null);
 
@@ -63,7 +61,7 @@ export function SettingsScreenV2() {
         message:
           "Checkout this amazing water tracking app! Stay hydrated and healthy",
       });
-    } catch (error) {
+    } catch {
       Alert.alert("Error", "Could not share app");
     }
   };

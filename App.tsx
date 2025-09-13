@@ -1,13 +1,12 @@
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { NavigationContainer } from "@react-navigation/native";
 import { useEffect } from "react";
-import { StyleSheet } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { HomeScreen } from "./HomeScreen";
 import { NotificationScreen } from "./NotificationScreen";
 import * as Notifications from "expo-notifications";
 import { SettingsScreenV2 } from "./SettingsScreenV2";
-import WaterTrackerHome, { HomeScreenV2 } from "./HomeScreenV2";
+import WaterTrackerHome from "./HomeScreenV2";
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({

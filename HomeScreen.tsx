@@ -1,8 +1,7 @@
 import { StyleSheet, Text, TouchableOpacity, View, Dimensions } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import { Canvas, Path } from "@shopify/react-native-skia";
-import { useState } from "react";
-import * as Notifications from 'expo-notifications';
+import React, { useState } from 'react';
 interface CustomButtonProps {
   title: string;
   onPress: () => void;
