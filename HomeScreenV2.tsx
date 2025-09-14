@@ -12,14 +12,9 @@ import {
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const WaterTrackerHome = () => {
-  const [currentIntake, setCurrentIntake] = useState(1250); // ml
+  const [currentIntake, setCurrentIntake] = useState(0); // ml
   const [dailyGoal, setDailyGoal] = useState(2000); // ml
-  const [todaysEntries, setTodaysEntries] = useState([
-    { time: '08:30', amount: 250, type: 'water' },
-    { time: '10:15', amount: 300, type: 'water' },
-    { time: '12:00', amount: 400, type: 'water' },
-    { time: '14:30', amount: 300, type: 'tea' },
-  ]);
+  const [todaysEntries, setTodaysEntries] = useState<WaterEntry[]>([]);
 
   // Animation references
   const waterLevelAnimation = useRef(new Animated.Value(0)).current;
@@ -52,7 +47,7 @@ const WaterTrackerHome = () => {
     }).start();
 
     // Continuous wave animations
-    const createWaveAnimation = (animatedValue, duration, delay = 0) => {
+    const createWaveAnimation = (animatedValue: Animated.Value, duration: number, delay = 0) => {
       return Animated.loop(
         Animated.sequence([
           Animated.delay(delay),
@@ -75,7 +70,7 @@ const WaterTrackerHome = () => {
 
   }, [currentIntake, dailyGoal, percentage]);
 
-  const saveDailyGoal = async (goal) => {
+  const saveDailyGoal = async (goal: number) => {
     try {
       await AsyncStorage.setItem('dailyGoal', JSON.stringify(goal));
     } catch {
@@ -94,12 +89,12 @@ const WaterTrackerHome = () => {
     }
   };
 
-  const updateDailyGoal = (newGoal) => {
+  const updateDailyGoal = (newGoal: number) => {
     setDailyGoal(newGoal);
     saveDailyGoal(newGoal);
   };
 
-  const saveCurrentIntake = async (intake) => {
+  const saveCurrentIntake = async (intake: number) => {
     try {
       await AsyncStorage.setItem('currentIntake', JSON.stringify(intake));
     } catch {
@@ -118,7 +113,7 @@ const WaterTrackerHome = () => {
     }
   };
 
-  const saveTodaysEntries = async (entries) => {
+  const saveTodaysEntries = async (entries: WaterEntry[]) => {
     try {
       await AsyncStorage.setItem('todaysEntries', JSON.stringify(entries));
     } catch {
@@ -224,7 +219,7 @@ const WaterTrackerHome = () => {
         {
           text: 'Update',
           onPress: (goal) => {
-            const numGoal = parseInt(goal);
+            const numGoal = parseInt(goal ?? '');
             if (!isNaN(numGoal) && numGoal > 0) {
               updateDailyGoal(numGoal);
             }
@@ -246,7 +241,7 @@ const WaterTrackerHome = () => {
         {
           text: 'Add',
           onPress: (amount) => {
-            const numAmount = parseInt(amount);
+            const numAmount = parseInt(amount ?? '');
             if (!isNaN(numAmount) && numAmount > 0) {
               addWater(numAmount);
             }
