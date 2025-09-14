@@ -7,6 +7,7 @@ import { NotificationScreen } from "./NotificationScreen";
 import * as Notifications from "expo-notifications";
 import { SettingsScreenV2 } from "./SettingsScreenV2";
 import WaterTrackerHome from "./HomeScreenV2";
+import HistoryScreen from "./HistoryScreen";
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -44,7 +45,8 @@ export default function App() {
               iconName = "home";
             } else if (route.name === "HomeV2") {
               iconName = "home";
-            } else if (route.name === "Settings") {
+            } else if (route.name === "History") {
+              iconName = focused ? "list" : "list-outline";
               iconName = focused ? "settings" : "settings-outline";
             } else if (route.name === "Notification") {
               iconName = focused
@@ -65,6 +67,7 @@ export default function App() {
         <Tab.Screen name="HomeV2" component={WaterTrackerHome} />
         <Tab.Screen name="Notification" component={NotificationScreen} />
         <Tab.Screen name="Settings" component={SettingsScreenV2} />
+        <Tab.Screen name="History" component={HistoryScreen} />
       </Tab.Navigator>
     </NavigationContainer>
   );

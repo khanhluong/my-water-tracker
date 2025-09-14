@@ -1,4 +1,4 @@
-class WaterEntry {
+export default class WaterEntry {
   time: string;
   amount: number;
   type: string;

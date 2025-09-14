@@ -10,6 +10,7 @@ import {
   Alert,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import WaterEntry from './WaterEntry';
 
 const WaterTrackerHome = () => {
   const [currentIntake, setCurrentIntake] = useState(0); // ml
