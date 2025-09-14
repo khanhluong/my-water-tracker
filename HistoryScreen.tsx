@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { View, Text, StyleSheet, FlatList } from 'react-native';
+import { View, Text, StyleSheet, FlatList, SafeAreaView, StatusBar } from 'react-native';
 import { WaterIntakeHistory } from './WaterIntakeHistory';
 import waterIntakeHistoryData from './waterIntakeHistoryData';
 
@@ -22,21 +22,23 @@ const HistoryScreen = () => {
   );
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <Text style={styles.title}>Water Intake History</Text>
       <FlatList
         data={waterIntakeHistoryData}
         renderItem={renderItem}
         keyExtractor={(item, index) => index.toString()}
       />
-    </View>
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
+    paddingTop: StatusBar.currentHeight,
+    paddingLeft: 10,
+    paddingRight: 10,
     backgroundColor: '#f5f5f5',
   },
   title: {
