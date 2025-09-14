@@ -37,6 +37,8 @@ const WaterTrackerHome = () => {
 
   useEffect(() => {
     loadDailyGoal();
+    loadCurrentIntake();
+    loadTodaysEntries();
   }, []);
 
   useEffect(() => {
@@ -97,6 +99,44 @@ const WaterTrackerHome = () => {
     saveDailyGoal(newGoal);
   };
 
+  const saveCurrentIntake = async (intake) => {
+    try {
+      await AsyncStorage.setItem('currentIntake', JSON.stringify(intake));
+    } catch {
+      Alert.alert('Error', 'Failed to save current intake.');
+    }
+  };
+
+  const loadCurrentIntake = async () => {
+    try {
+      const value = await AsyncStorage.getItem('currentIntake');
+      if (value !== null) {
+        setCurrentIntake(JSON.parse(value));
+      }
+    } catch {
+      Alert.alert('Error', 'Failed to load current intake.');
+    }
+  };
+
+  const saveTodaysEntries = async (entries) => {
+    try {
+      await AsyncStorage.setItem('todaysEntries', JSON.stringify(entries));
+    } catch {
+      Alert.alert('Error', 'Failed to save todays entries.');
+    }
+  };
+
+  const loadTodaysEntries = async () => {
+    try {
+      const value = await AsyncStorage.getItem('todaysEntries');
+      if (value !== null) {
+        setTodaysEntries(JSON.parse(value));
+      }
+    } catch {
+      Alert.alert('Error', 'Failed to load todays entries.');
+    }
+  };
+
   const animateWaterDrop = () => {
     // Reset animations
     dropAnimation.setValue(-50);
@@ -145,6 +185,7 @@ const WaterTrackerHome = () => {
   const addWater = (amount: number) => {
     const newIntake = currentIntake + amount;
     setCurrentIntake(newIntake);
+    saveCurrentIntake(newIntake);
 
     const currentTime = new Date().toLocaleTimeString([], {
       hour: '2-digit',
@@ -157,7 +198,9 @@ const WaterTrackerHome = () => {
       type: 'water'
     };
 
-    setTodaysEntries(prev => [newEntry, ...prev]);
+    const newEntries = [newEntry, ...todaysEntries];
+    setTodaysEntries(newEntries);
+    saveTodaysEntries(newEntries);
     animateWaterDrop();
 
     // Congratulations when goal is reached
