@@ -8,6 +8,9 @@ import {
   Animated,
   Platform,
   Alert,
+  Modal,
+  TextInput,
+  TouchableWithoutFeedback,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import WaterEntry from '../models/WaterEntry';
@@ -16,6 +19,9 @@ const WaterTrackerHome = () => {
   const [currentIntake, setCurrentIntake] = useState(0); // ml
   const [dailyGoal, setDailyGoal] = useState(2000); // ml
   const [todaysEntries, setTodaysEntries] = useState<WaterEntry[]>([]);
+  const [isCustomAmountModalVisible, setIsCustomAmountModalVisible] =
+    useState(false);
+  const [customAmount, setCustomAmount] = useState('');
 
   // Animation references
   const waterLevelAnimation = useRef(new Animated.Value(0)).current;
@@ -48,7 +54,11 @@ const WaterTrackerHome = () => {
     }).start();
 
     // Continuous wave animations
-    const createWaveAnimation = (animatedValue: Animated.Value, duration: number, delay = 0) => {
+    const createWaveAnimation = (
+      animatedValue: Animated.Value,
+      duration: number,
+      delay = 0
+    ) => {
       return Animated.loop(
         Animated.sequence([
           Animated.delay(delay),
@@ -68,7 +78,6 @@ const WaterTrackerHome = () => {
 
     createWaveAnimation(waveAnimation1, 2000).start();
     createWaveAnimation(waveAnimation2, 2500, 500).start();
-
   }, [currentIntake, dailyGoal, percentage]);
 
   const saveDailyGoal = async (goal: number) => {
@@ -185,13 +194,13 @@ const WaterTrackerHome = () => {
 
     const currentTime = new Date().toLocaleTimeString([], {
       hour: '2-digit',
-      minute: '2-digit'
+      minute: '2-digit',
     });
 
     const newEntry = {
       time: currentTime,
       amount: amount,
-      type: 'water'
+      type: 'water',
     };
 
     const newEntries = [newEntry, ...todaysEntries];
@@ -204,7 +213,7 @@ const WaterTrackerHome = () => {
       setTimeout(() => {
         Alert.alert(
           '🎉 Congratulations!',
-          'You\'ve reached your daily hydration goal!',
+          "You've reached your daily hydration goal!",
           [{ text: 'Awesome!', style: 'default' }]
         );
       }, 500);
@@ -224,8 +233,8 @@ const WaterTrackerHome = () => {
             if (!isNaN(numGoal) && numGoal > 0) {
               updateDailyGoal(numGoal);
             }
-          }
-        }
+          },
+        },
       ],
       'plain-text',
       dailyGoal.toString(),
@@ -234,25 +243,16 @@ const WaterTrackerHome = () => {
   };
 
   const handleCustomAmount = () => {
-    Alert.prompt(
-      'Add Custom Amount',
-      'Enter the amount of water in milliliters:',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Add',
-          onPress: (amount) => {
-            const numAmount = parseInt(amount ?? '');
-            if (!isNaN(numAmount) && numAmount > 0) {
-              addWater(numAmount);
-            }
-          }
-        }
-      ],
-      'plain-text',
-      '',
-      'numeric'
-    );
+    setIsCustomAmountModalVisible(true);
+  };
+
+  const handleAddCustomAmount = () => {
+    const numAmount = parseInt(customAmount);
+    if (!isNaN(numAmount) && numAmount > 0) {
+      addWater(numAmount);
+    }
+    setCustomAmount('');
+    setIsCustomAmountModalVisible(false);
   };
 
   const formatTime = () => {
@@ -260,15 +260,15 @@ const WaterTrackerHome = () => {
     return now.toLocaleDateString('en-US', {
       weekday: 'long',
       month: 'long',
-      day: 'numeric'
+      day: 'numeric',
     });
   };
 
   const getMotivationalMessage = () => {
     if (percentage >= 100) return "🎉 Goal achieved! You're well hydrated!";
-    if (percentage >= 75) return "💪 Almost there! Keep it up!";
+    if (percentage >= 75) return '💪 Almost there! Keep it up!';
     if (percentage >= 50) return "👍 Great progress! You're halfway there!";
-    if (percentage >= 25) return "🌟 Good start! Keep drinking!";
+    if (percentage >= 25) return '🌟 Good start! Keep drinking!';
     return "💧 Let's start hydrating! Your body will thank you!";
   };
 
@@ -286,7 +286,11 @@ const WaterTrackerHome = () => {
             <Text style={styles.greeting}>Good day! 👋</Text>
             <Text style={styles.date}>{formatTime()}</Text>
           </View>
-          <TouchableOpacity style={styles.settingsButton} activeOpacity={0.7} onPress={handleUpdateGoal}>
+          <TouchableOpacity
+            style={styles.settingsButton}
+            activeOpacity={0.7}
+            onPress={handleUpdateGoal}
+          >
             <Text style={styles.settingsIcon}>⚙️</Text>
           </TouchableOpacity>
         </View>
@@ -295,7 +299,9 @@ const WaterTrackerHome = () => {
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         {/* Main Water Tracker */}
         <View style={styles.trackerContainer}>
-          <Animated.View style={[styles.trackerCard, { transform: [{ scale: pulseAnimation }] }]}>
+          <Animated.View
+            style={[styles.trackerCard, { transform: [{ scale: pulseAnimation }] }]}
+          >
             {/* Water Drop Animation */}
             <Animated.View
               style={[
@@ -306,8 +312,8 @@ const WaterTrackerHome = () => {
                     inputRange: [-50, 0, 50],
                     outputRange: [0, 1, 0],
                     extrapolate: 'clamp',
-                  })
-                }
+                  }),
+                },
               ]}
             >
               <Text style={styles.dropIcon}>💧</Text>
@@ -326,7 +332,7 @@ const WaterTrackerHome = () => {
                         outputRange: ['0%', '100%'],
                         extrapolate: 'clamp',
                       }),
-                    }
+                    },
                   ]}
                 >
                   {/* Wave Animations */}
@@ -334,37 +340,48 @@ const WaterTrackerHome = () => {
                     style={[
                       styles.wave1,
                       {
-                        transform: [{
-                          translateX: waveAnimation1.interpolate({
-                            inputRange: [0, 1],
-                            outputRange: [-30, 30],
-                          })
-                        }]
-                      }
+                        transform: [
+                          {
+                            translateX: waveAnimation1.interpolate({
+                              inputRange: [0, 1],
+                              outputRange: [-30, 30],
+                            }),
+                          },
+                        ],
+                      },
                     ]}
                   />
                   <Animated.View
                     style={[
                       styles.wave2,
                       {
-                        transform: [{
-                          translateX: waveAnimation2.interpolate({
-                            inputRange: [0, 1],
-                            outputRange: [30, -30],
-                          })
-                        }]
-                      }
+                        transform: [
+                          {
+                            translateX: waveAnimation2.interpolate({
+                              inputRange: [0, 1],
+                              outputRange: [30, -30],
+                            }),
+                          },
+                        ],
+                      },
                     ]}
                   />
                 </Animated.View>
 
                 {/* Center Content */}
-                <Animated.View style={[styles.centerContent, { transform: [{ scale: scaleAnimation }] }]}>
+                <Animated.View
+                  style={[
+                    styles.centerContent,
+                    { transform: [{ scale: scaleAnimation }] },
+                  ]}
+                >
                   <Text style={styles.currentAmount}>{currentIntake}</Text>
                   <Text style={styles.unit}>ml</Text>
                   <View style={styles.goalContainer}>
                     <Text style={styles.goalText}>of {dailyGoal}ml</Text>
-                    <Text style={styles.percentage}>{Math.round(percentage)}%</Text>
+                    <Text style={styles.percentage}>
+                      {Math.round(percentage)}%
+                    </Text>
                   </View>
                 </Animated.View>
               </View>
@@ -464,12 +481,69 @@ const WaterTrackerHome = () => {
           <Animated.View style={styles.achievementBadge}>
             <Text style={styles.achievementIcon}>🏆</Text>
             <Text style={styles.achievementTitle}>Daily Goal Achieved!</Text>
-            <Text style={styles.achievementSubtitle}>Excellent hydration today!</Text>
+            <Text style={styles.achievementSubtitle}>
+              Excellent hydration today!
+            </Text>
           </Animated.View>
         )}
 
         <View style={styles.bottomSpacer} />
       </ScrollView>
+
+      {/* Custom Amount Modal */}
+      <Modal
+        transparent={true}
+        animationType="fade"
+        visible={isCustomAmountModalVisible}
+        onRequestClose={() => setIsCustomAmountModalVisible(false)}
+      >
+        <TouchableOpacity
+          style={styles.modalOverlay}
+          activeOpacity={1}
+          onPressOut={() => setIsCustomAmountModalVisible(false)}
+        >
+          <TouchableWithoutFeedback>
+            <View style={styles.modalContent}>
+              <Text style={styles.modalTitle}>Add Custom Amount</Text>
+              <Text style={styles.modalSubtitle}>
+                Enter the amount of water in milliliters.
+              </Text>
+              <TextInput
+                style={styles.modalInput}
+                placeholder="e.g., 350"
+                keyboardType="numeric"
+                value={customAmount}
+                onChangeText={setCustomAmount}
+                autoFocus
+              />
+              <View style={styles.modalButtonContainer}>
+                <TouchableOpacity
+                  style={[styles.modalButton, styles.modalButtonCancel]}
+                  onPress={() => {
+                    setCustomAmount('');
+                    setIsCustomAmountModalVisible(false);
+                  }}
+                >
+                  <Text
+                    style={[
+                      styles.modalButtonText,
+                      styles.modalButtonTextCancel,
+                    ]}
+                  >
+                    Cancel
+                  </Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[styles.modalButton, styles.modalButtonAdd]}
+                  onPress={handleAddCustomAmount}
+                >
+                  <Text style={styles.modalButtonText}>Add</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </TouchableWithoutFeedback>
+        </TouchableOpacity>
+      </Modal>
     </View>
   );
 };
@@ -825,6 +899,77 @@ const styles = StyleSheet.create({
   },
   bottomSpacer: {
     height: 24,
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalContent: {
+    backgroundColor: 'white',
+    borderRadius: 20,
+    padding: 24,
+    width: '85%',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 8,
+    elevation: 10,
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#1E293B',
+    marginBottom: 8,
+    textAlign: 'center',
+  },
+  modalSubtitle: {
+    fontSize: 14,
+    color: '#64748B',
+    textAlign: 'center',
+    marginBottom: 20,
+  },
+  modalInput: {
+    backgroundColor: '#F1F5F9',
+    borderRadius: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    fontSize: 18,
+    color: '#1E293B',
+    textAlign: 'center',
+    marginBottom: 24,
+    borderWidth: 1,
+    borderColor: '#E2E8F0',
+  },
+  modalButtonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  modalButton: {
+    flex: 1,
+    paddingVertical: 14,
+    borderRadius: 16,
+    alignItems: 'center',
+  },
+  modalButtonCancel: {
+    backgroundColor: '#F1F5F9',
+    marginRight: 8,
+  },
+  modalButtonAdd: {
+    backgroundColor: '#3B82F6',
+    marginLeft: 8,
+  },
+  modalButtonText: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: 'white',
+  },
+  modalButtonTextCancel: {
+    color: '#334155',
   },
 });
 

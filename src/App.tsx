@@ -6,6 +6,7 @@ import { NotificationScreen } from "./screens/NotificationScreen";
 import * as Notifications from "expo-notifications";
 import { SettingsScreenV2 } from "./screens/SettingsScreenV2";
 import HistoryScreen from "./screens/HistoryScreen";
+import WaterTrackerHome from "./screens/HomeScreenV2";
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -61,7 +62,7 @@ export default function App() {
         })}
       >
         {/* <Tab.Screen name="Home" component={HomeScreen} /> */}
-        {/* <Tab.Screen name="HomeV2" component={WaterTrackerHome} /> */}
+        <Tab.Screen name="HomeV2" component={WaterTrackerHome} />
         <Tab.Screen name="Notification" component={NotificationScreen} />
         <Tab.Screen name="History" component={HistoryScreen} />
         <Tab.Screen name="Settings" component={SettingsScreenV2} />
