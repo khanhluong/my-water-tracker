@@ -2,11 +2,9 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { NavigationContainer } from "@react-navigation/native";
 import { useEffect } from "react";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { HomeScreen } from "./screens/HomeScreen";
 import { NotificationScreen } from "./screens/NotificationScreen";
 import * as Notifications from "expo-notifications";
 import { SettingsScreenV2 } from "./screens/SettingsScreenV2";
-import WaterTrackerHome from "./screens/HomeScreenV2";
 import HistoryScreen from "./screens/HistoryScreen";
 
 Notifications.setNotificationHandler({
@@ -41,9 +39,7 @@ export default function App() {
           headerShown: false, // Optional: hides the header for a cleaner look
           tabBarIcon: ({ focused, color, size }) => {
             let iconName: keyof typeof Ionicons.glyphMap = "home";
-            if (route.name === "Home") {
-              iconName = "home";
-            } else if (route.name === "HomeV2") {
+            if (route.name === "HomeV2") {
               iconName = "home";
             } else if (route.name === "History") {
               iconName = focused ? "list" : "list-outline";
@@ -58,17 +54,17 @@ export default function App() {
           },
           tabBarStyle: {
             position: "absolute",
-            backgroundColor: "transparent",
+            // backgroundColor: "transparent",
             borderTopWidth: 0, // Removes the top border
             elevation: 0, // Removes the shadow on Android
           },
         })}
       >
-        <Tab.Screen name="Home" component={HomeScreen} />
-        <Tab.Screen name="HomeV2" component={WaterTrackerHome} />
+        {/* <Tab.Screen name="Home" component={HomeScreen} /> */}
+        {/* <Tab.Screen name="HomeV2" component={WaterTrackerHome} /> */}
         <Tab.Screen name="Notification" component={NotificationScreen} />
-        <Tab.Screen name="Settings" component={SettingsScreenV2} />
         <Tab.Screen name="History" component={HistoryScreen} />
+        <Tab.Screen name="Settings" component={SettingsScreenV2} />
       </Tab.Navigator>
     </NavigationContainer>
   );

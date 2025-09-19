@@ -4,9 +4,11 @@ import { View, Text, StyleSheet, FlatList, SafeAreaView, StatusBar, TouchableOpa
 import { WaterIntakeHistory } from '../models/WaterIntakeHistory';
 import waterIntakeHistoryData from '../models/waterIntakeHistoryData';
 import { LineChart } from 'react-native-chart-kit';
+import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 
 const HistoryScreen = () => {
   const [viewMode, setViewMode] = useState('list'); // 'list' or 'graph'
+  const tabBarHeight = useBottomTabBarHeight();
 
   const renderItem = ({ item }: { item: WaterIntakeHistory }) => (
     <View style={styles.entryContainer}>
@@ -47,9 +49,10 @@ const HistoryScreen = () => {
           data={waterIntakeHistoryData}
           renderItem={renderItem}
           keyExtractor={(item, index) => index.toString()}
+          contentContainerStyle={{ paddingBottom: tabBarHeight }}
         />
       ) : (
-        <View style={styles.chartContainer}>
+        <View style={[styles.chartContainer, { paddingBottom: tabBarHeight }]}>
           <LineChart
             data={chartData}
             width={Dimensions.get('window').width - 20}
