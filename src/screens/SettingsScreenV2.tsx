@@ -11,14 +11,30 @@ import {
   Share,
 } from "react-native";
 import { commonStyles } from "../styles/commonStyles";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { TouchableOpacity } from "react-native";
+import { saveSetting, loadSetting } from '../services/settingsService';
 
 export function SettingsScreenV2() {
   const [units, setUnits] = useState("metric");
   const [darkMode, setDarkMode] = useState(false);
   const [soundEnabled, setSoundEnabled] = useState(true);
   const [modalVisible, setModalVisible] = useState<null | string>(null);
+
+  useEffect(() => {
+    const loadSettings = async () => {
+      const darkModeValue = await loadSetting('darkMode');
+      if (darkModeValue !== null) {
+        setDarkMode(darkModeValue);
+      }
+    };
+    loadSettings();
+  }, []);
+
+  const handleDarkModeChange = (value: boolean) => {
+    setDarkMode(value);
+    saveSetting('darkMode', value);
+  };
 
   const unitOptions = [
     {
@@ -34,7 +50,7 @@ export function SettingsScreenV2() {
     { value: "mixed", label: "Mixed Units", desc: "Both metric and imperial" },
   ];
 
-  const handleUnitChange = (unit) => {
+  const handleUnitChange = (unit: string) => {
     setUnits(unit);
     setModalVisible(null);
     Alert.alert(
@@ -197,7 +213,7 @@ export function SettingsScreenV2() {
           rightComponent={
             <Switch
               value={darkMode}
-              onValueChange={setDarkMode}
+              onValueChange={handleDarkModeChange}
               trackColor={{ false: "#E5E7EB", true: "#93C5FD" }}
               thumbColor={darkMode ? "#3B82F6" : "#F3F4F6"}
             />
