@@ -2,12 +2,12 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { NavigationContainer } from "@react-navigation/native";
 import { useEffect } from "react";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { HomeScreen } from "./HomeScreen";
-import { NotificationScreen } from "./NotificationScreen";
+import { HomeScreen } from "./screens/HomeScreen";
+import { NotificationScreen } from "./screens/NotificationScreen";
 import * as Notifications from "expo-notifications";
-import { SettingsScreenV2 } from "./SettingsScreenV2";
-import WaterTrackerHome from "./HomeScreenV2";
-import HistoryScreen from "./HistoryScreen";
+import { SettingsScreenV2 } from "./screens/SettingsScreenV2";
+import WaterTrackerHome from "./screens/HomeScreenV2";
+import HistoryScreen from "./screens/HistoryScreen";
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -47,6 +47,7 @@ export default function App() {
               iconName = "home";
             } else if (route.name === "History") {
               iconName = focused ? "list" : "list-outline";
+            } else if (route.name === "Settings") {
               iconName = focused ? "settings" : "settings-outline";
             } else if (route.name === "Notification") {
               iconName = focused

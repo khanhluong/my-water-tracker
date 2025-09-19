@@ -1,8 +1,8 @@
 
 import React from 'react';
 import { View, Text, StyleSheet, FlatList, SafeAreaView, StatusBar } from 'react-native';
-import { WaterIntakeHistory } from './WaterIntakeHistory';
-import waterIntakeHistoryData from './waterIntakeHistoryData';
+import { WaterIntakeHistory } from '../models/WaterIntakeHistory';
+import waterIntakeHistoryData from '../models/waterIntakeHistoryData';
 
 const HistoryScreen = () => {
   const renderItem = ({ item }: { item: WaterIntakeHistory }) => (

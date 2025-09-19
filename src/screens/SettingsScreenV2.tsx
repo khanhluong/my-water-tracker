@@ -10,7 +10,7 @@ import {
   Platform,
   Share,
 } from "react-native";
-import { commonStyles } from "./styles/commonStyles";
+import { commonStyles } from "../styles/commonStyles";
 import React, { useState } from "react";
 import { TouchableOpacity } from "react-native";
 

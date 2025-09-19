@@ -3,7 +3,7 @@ import {
   SchedulableTriggerInputTypes,
   scheduleNotificationAsync,
 } from "expo-notifications";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button, View } from "react-native";
 
 export default function NotificationRemider() {
@@ -36,11 +36,14 @@ export default function NotificationRemider() {
         },
       });
     }
-    setScheduling(fail);
+    setScheduling(false);
   }
 
-  requestPermissions();
-  scheduleNotification();
+  useEffect(() => {
+    requestPermissions();
+    scheduleNotification();
+  }, []);
+
   return (
     <View>
       <Button
