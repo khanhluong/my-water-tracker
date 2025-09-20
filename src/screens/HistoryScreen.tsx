@@ -2,13 +2,25 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, FlatList, SafeAreaView, StatusBar, TouchableOpacity, Dimensions } from 'react-native';
 import { WaterIntakeHistory } from '../models/WaterIntakeHistory';
-import waterIntakeHistoryData from '../models/waterIntakeHistoryData';
 import { LineChart } from 'react-native-chart-kit';
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
+import { useFocusEffect } from '@react-navigation/native';
+import { waterIntakeRepository } from '../repositories/waterIntakeRepository';
 
 const HistoryScreen = () => {
   const [viewMode, setViewMode] = useState('list'); // 'list' or 'graph'
+  const [history, setHistory] = useState<WaterIntakeHistory[]>([]);
   const tabBarHeight = useBottomTabBarHeight();
+
+  useFocusEffect(
+    React.useCallback(() => {
+      const loadHistory = async () => {
+        const historyData = await waterIntakeRepository.getHistory();
+        setHistory(historyData);
+      };
+      loadHistory();
+    }, [])
+  );
 
   const renderItem = ({ item }: { item: WaterIntakeHistory }) => (
     <View style={styles.entryContainer}>
@@ -27,10 +39,10 @@ const HistoryScreen = () => {
   );
 
   const chartData = {
-    labels: waterIntakeHistoryData.map(item => item.date.substring(5)).reverse(),
+    labels: history.length > 0 ? history.map(item => item.date.substring(5)).reverse() : [" "],
     datasets: [
       {
-        data: waterIntakeHistoryData.map(item => item.entries.reduce((total, entry) => total + entry.amount, 0)).reverse()
+        data: history.length > 0 ? history.map(item => item.entries.reduce((total, entry) => total + entry.amount, 0)).reverse() : [0]
       }
     ]
   };
@@ -46,13 +58,15 @@ const HistoryScreen = () => {
 
       {viewMode === 'list' ? (
         <FlatList
-          data={waterIntakeHistoryData}
+          data={history}
           renderItem={renderItem}
           keyExtractor={(item, index) => index.toString()}
           contentContainerStyle={{ paddingBottom: tabBarHeight }}
+          ListEmptyComponent={<View style={styles.emptyContainer}><Text style={styles.emptyText}>No history yet. Add some water on the Home screen!</Text></View>}
         />
       ) : (
         <View style={[styles.chartContainer, { paddingBottom: tabBarHeight }]}>
+        {history.length > 0 ? (
           <LineChart
             data={chartData}
             width={Dimensions.get('window').width - 20}
@@ -82,6 +96,11 @@ const HistoryScreen = () => {
               borderRadius: 16
             }}
           />
+          ) : (
+            <View style={styles.emptyContainer}>
+              <Text style={styles.emptyText}>No data to display in graph.</Text>
+            </View>
+          )}
         </View>
       )}
     </SafeAreaView>
@@ -135,6 +154,16 @@ const styles = StyleSheet.create({
   },
   chartContainer: {
     alignItems: 'center',
+  },
+  emptyContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 50,
+  },
+  emptyText: {
+    fontSize: 16,
+    color: '#888',
   }
 });
 

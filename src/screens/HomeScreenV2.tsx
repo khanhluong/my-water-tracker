@@ -14,6 +14,7 @@ import {
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import WaterEntry from '../models/WaterEntry';
+import { waterIntakeRepository } from '../repositories/waterIntakeRepository';
 
 const WaterTrackerHome = () => {
   const [currentIntake, setCurrentIntake] = useState(0); // ml
@@ -41,6 +42,7 @@ const WaterTrackerHome = () => {
     loadDailyGoal();
     loadCurrentIntake();
     loadTodaysEntries();
+    waterIntakeRepository.setupDatabase();
   }, []);
 
   useEffect(() => {
@@ -203,6 +205,8 @@ const WaterTrackerHome = () => {
       type: 'water',
     };
 
+    waterIntakeRepository.addWaterEntry(amount, 'water');
+
     const newEntries = [newEntry, ...todaysEntries];
     setTodaysEntries(newEntries);
     saveTodaysEntries(newEntries);
@@ -276,6 +280,7 @@ const WaterTrackerHome = () => {
     const remaining = Math.max(dailyGoal - currentIntake, 0);
     return remaining;
   };
+
 
   return (
     <View style={styles.container}>

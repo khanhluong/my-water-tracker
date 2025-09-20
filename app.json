@@ -24,6 +24,9 @@
     },
     "web": {
       "favicon": "./scr/assets/favicon.png"
-    }
+    },
+    "plugins": [
+      "expo-sqlite"
+    ]
   }
 }
