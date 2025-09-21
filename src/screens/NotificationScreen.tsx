@@ -8,6 +8,7 @@ import {
   Alert,
 } from "react-native";
 import DatePicker from "react-native-date-picker";
+import * as Notifications from "expo-notifications";
 import { styles } from "./NotificationScreen.styles";
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 
@@ -100,10 +101,57 @@ export function NotificationScreen() {
     }
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
+    await Notifications.cancelAllScheduledNotificationsAsync();
+
+    if (!isEnabled) {
+      Alert.alert("Settings Saved", "Reminders are now disabled.", [
+        { text: "OK" },
+      ]);
+      return;
+    }
+
+    const dayMapping = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+    let notificationsScheduled = 0;
+
+    for (let i = 0; i < 7; i++) {
+      // Schedule for the next 7 days
+      const dayToSchedule = new Date();
+      dayToSchedule.setDate(dayToSchedule.getDate() + i);
+      const dayName = dayMapping[dayToSchedule.getDay()];
+
+      if (selectedDays.includes(dayName)) {
+        const triggerTime = new Date(dayToSchedule);
+        triggerTime.setHours(startTime.getHours(), startTime.getMinutes(), 0, 0);
+
+        const endTimeOnDay = new Date(dayToSchedule);
+        endTimeOnDay.setHours(endTime.getHours(), endTime.getMinutes(), 0, 0);
+
+        while (triggerTime <= endTimeOnDay) {
+          // Only schedule notifications in the future
+          if (triggerTime > new Date()) {
+            await Notifications.scheduleNotificationAsync({
+              content: {
+                title: "💧 Time for a glass of water!",
+                body: "Staying hydrated is key to a great day. Let's drink up!",
+                sound: true, // Using default sound
+              },
+              trigger: {
+                type: Notifications.SchedulableTriggerInputTypes.DATE,
+                date: triggerTime
+              },
+            });
+            notificationsScheduled++;
+          }
+          // Increment by the interval
+          triggerTime.setMinutes(triggerTime.getMinutes() + interval);
+        }
+      }
+    }
+
     Alert.alert(
       "Settings Saved",
-      "Your water reminder settings have been saved successfully!",
+      `Successfully scheduled ${notificationsScheduled} reminders for the next 7 days.`,
       [{ text: "OK" }]
     );
   };
