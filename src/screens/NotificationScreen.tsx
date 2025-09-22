@@ -7,10 +7,10 @@ import {
   TouchableOpacity,
   Alert,
 } from "react-native";
-import DatePicker from "react-native-date-picker";
 import * as Notifications from "expo-notifications";
 import { styles } from "./NotificationScreen.styles";
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
+import DateTimePicker from "@react-native-community/datetimepicker";
 
 export function NotificationScreen() {
   const [isEnabled, setIsEnabled] = useState(true);
@@ -68,6 +68,34 @@ export function NotificationScreen() {
     const diffHours = diffMs / (1000 * 60 * 60);
     if (diffHours <= 0) return 0;
     return Math.floor((diffHours * 60) / interval) + 1;
+  };
+
+  const onStartTimeChange = (event: unknown, selectedDate?: Date) => {
+    setShowStartPicker(false);
+    if (selectedDate) {
+      if (selectedDate >= endTime) {
+        Alert.alert(
+          "Invalid Time",
+          "Start time cannot be after or the same as end time."
+        );
+      } else {
+        setStartTime(selectedDate);
+      }
+    }
+  };
+
+  const onEndTimeChange = (event: unknown, selectedDate?: Date) => {
+    setShowEndPicker(false);
+    if (selectedDate) {
+      if (selectedDate <= startTime) {
+        Alert.alert(
+          "Invalid Time",
+          "End time cannot be before or the same as start time."
+        );
+      } else {
+        setEndTime(selectedDate);
+      }
+    }
   };
 
   const getNextReminder = () => {
@@ -329,32 +357,26 @@ export function NotificationScreen() {
           </TouchableOpacity>
         </View>
       </ScrollView>
-      <DatePicker
-        modal
-        mode="time"
-        open={showStartPicker}
-        date={startTime}
-        onConfirm={(date) => {
-          setShowStartPicker(false);
-          setStartTime(date);
-        }}
-        onCancel={() => {
-          setShowStartPicker(false);
-        }}
-      />
-      <DatePicker
-        modal
-        mode="time"
-        open={showEndPicker}
-        date={endTime}
-        onConfirm={(date) => {
-          setShowEndPicker(false);
-          setEndTime(date);
-        }}
-        onCancel={() => {
-          setShowEndPicker(false);
-        }}
-      />
+      {showStartPicker && (
+        <DateTimePicker
+          testID="startTimePicker"
+          value={startTime}
+          mode={"time"}
+          is24Hour={true}
+          display="default"
+          onChange={onStartTimeChange}
+        />
+      )}
+      {showEndPicker && (
+        <DateTimePicker
+          testID="endTimePicker"
+          value={endTime}
+          mode={"time"}
+          is24Hour={true}
+          display="default"
+          onChange={onEndTimeChange}
+        />
+      )}
     </>
   );
 }
