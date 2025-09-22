@@ -7,9 +7,10 @@ import {
   TouchableOpacity,
   Alert,
 } from "react-native";
-import DatePicker from "react-native-date-picker";
+import * as Notifications from "expo-notifications";
 import { styles } from "./NotificationScreen.styles";
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
+import DateTimePicker from "@react-native-community/datetimepicker";
 
 export function NotificationScreen() {
   const [isEnabled, setIsEnabled] = useState(true);
@@ -69,6 +70,34 @@ export function NotificationScreen() {
     return Math.floor((diffHours * 60) / interval) + 1;
   };
 
+  const onStartTimeChange = (event: unknown, selectedDate?: Date) => {
+    setShowStartPicker(false);
+    if (selectedDate) {
+      if (selectedDate >= endTime) {
+        Alert.alert(
+          "Invalid Time",
+          "Start time cannot be after or the same as end time."
+        );
+      } else {
+        setStartTime(selectedDate);
+      }
+    }
+  };
+
+  const onEndTimeChange = (event: unknown, selectedDate?: Date) => {
+    setShowEndPicker(false);
+    if (selectedDate) {
+      if (selectedDate <= startTime) {
+        Alert.alert(
+          "Invalid Time",
+          "End time cannot be before or the same as start time."
+        );
+      } else {
+        setEndTime(selectedDate);
+      }
+    }
+  };
+
   const getNextReminder = () => {
     const now = new Date();
     const today = now.toLocaleDateString("en-US", { weekday: "short" });
@@ -100,10 +129,57 @@ export function NotificationScreen() {
     }
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
+    await Notifications.cancelAllScheduledNotificationsAsync();
+
+    if (!isEnabled) {
+      Alert.alert("Settings Saved", "Reminders are now disabled.", [
+        { text: "OK" },
+      ]);
+      return;
+    }
+
+    const dayMapping = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+    let notificationsScheduled = 0;
+
+    for (let i = 0; i < 7; i++) {
+      // Schedule for the next 7 days
+      const dayToSchedule = new Date();
+      dayToSchedule.setDate(dayToSchedule.getDate() + i);
+      const dayName = dayMapping[dayToSchedule.getDay()];
+
+      if (selectedDays.includes(dayName)) {
+        const triggerTime = new Date(dayToSchedule);
+        triggerTime.setHours(startTime.getHours(), startTime.getMinutes(), 0, 0);
+
+        const endTimeOnDay = new Date(dayToSchedule);
+        endTimeOnDay.setHours(endTime.getHours(), endTime.getMinutes(), 0, 0);
+
+        while (triggerTime <= endTimeOnDay) {
+          // Only schedule notifications in the future
+          if (triggerTime > new Date()) {
+            await Notifications.scheduleNotificationAsync({
+              content: {
+                title: "💧 Time for a glass of water!",
+                body: "Staying hydrated is key to a great day. Let's drink up!",
+                sound: true, // Using default sound
+              },
+              trigger: {
+                type: Notifications.SchedulableTriggerInputTypes.DATE,
+                date: triggerTime
+              },
+            });
+            notificationsScheduled++;
+          }
+          // Increment by the interval
+          triggerTime.setMinutes(triggerTime.getMinutes() + interval);
+        }
+      }
+    }
+
     Alert.alert(
       "Settings Saved",
-      "Your water reminder settings have been saved successfully!",
+      `Successfully scheduled ${notificationsScheduled} reminders for the next 7 days.`,
       [{ text: "OK" }]
     );
   };
@@ -281,32 +357,26 @@ export function NotificationScreen() {
           </TouchableOpacity>
         </View>
       </ScrollView>
-      <DatePicker
-        modal
-        mode="time"
-        open={showStartPicker}
-        date={startTime}
-        onConfirm={(date) => {
-          setShowStartPicker(false);
-          setStartTime(date);
-        }}
-        onCancel={() => {
-          setShowStartPicker(false);
-        }}
-      />
-      <DatePicker
-        modal
-        mode="time"
-        open={showEndPicker}
-        date={endTime}
-        onConfirm={(date) => {
-          setShowEndPicker(false);
-          setEndTime(date);
-        }}
-        onCancel={() => {
-          setShowEndPicker(false);
-        }}
-      />
+      {showStartPicker && (
+        <DateTimePicker
+          testID="startTimePicker"
+          value={startTime}
+          mode={"time"}
+          is24Hour={true}
+          display="default"
+          onChange={onStartTimeChange}
+        />
+      )}
+      {showEndPicker && (
+        <DateTimePicker
+          testID="endTimePicker"
+          value={endTime}
+          mode={"time"}
+          is24Hour={true}
+          display="default"
+          onChange={onEndTimeChange}
+        />
+      )}
     </>
   );
 }
