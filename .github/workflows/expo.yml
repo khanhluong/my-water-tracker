@@ -35,7 +35,7 @@ jobs:
 
       # Install dependencies
       - name: Install dependencies
-        run: npm ci --force
+        run: npm ci --strict-peer-deps
 
         # Run linting (optional, if you have a lint script)
       - name: Run ESLint
