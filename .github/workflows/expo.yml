@@ -35,7 +35,7 @@ jobs:
 
       # Install dependencies
       - name: Install dependencies
-        run: npm ci --legacy-peer-deps
+        run: npm install --legacy-peer-deps
 
         # Run linting (optional, if you have a lint script)
       - name: Run ESLint
